@@ -1,6 +1,7 @@
 import Search from './models/Search';
 import {elements} from './views/Base';
 import * as searchView from './views/searchView';
+import Recipe from './models/Recipe';
 const state = {};
 const controlSearch = async () => {
     const query = searchView.getInput();
@@ -13,7 +14,26 @@ const controlSearch = async () => {
     }
 }
 
+const controlRecipe = async ()  => {
+    const id = window.location.hash.replace('#', '');
+    console.log(id);
+    if (id) {
+        try {
+            state.recipe = new Recipe(id);
+            await state.recipe.getrecipe();
+            state.recipe.calcTime();
+            state.recipe.calcServings();
+            console.log(state.recipe);
+        } catch (err) {
+            console.log(err);
+        }
+    }
+}
+
+['hashchange', 'load'].forEach(e => window.addEventListener(e, controlRecipe));
+
 elements.searchForm.addEventListener("submit", e => {
     e.preventDefault();
     controlSearch();
 });
+
