@@ -21,6 +21,7 @@ const controlRecipe = async ()  => {
         try {
             state.recipe = new Recipe(id);
             await state.recipe.getrecipe();
+            state.recipe.parseIngredients();
             state.recipe.calcTime();
             state.recipe.calcServings();
             console.log(state.recipe);
