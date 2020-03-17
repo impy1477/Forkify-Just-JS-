@@ -33,10 +33,22 @@ const controlRecipe = async ()  => {
     }
 }
 
-['hashchange', 'load'].forEach(e => window.addEventListener(e, controlRecipe));
-
 elements.searchForm.addEventListener("submit", e => {
     e.preventDefault();
     controlSearch();
 });
 
+['hashchange', 'load'].forEach(e => window.addEventListener(e, controlRecipe));
+
+elements.recipe.addEventListener('click', e => {
+    if (e.target.matches('.btn-decrease, .btn-decrease *')) {
+        if(state.recipe.servings > 1) {
+            state.recipe.updateServeings('dec');
+            recipeView.updateSertingsIngredients(state.recipe);
+        }
+    } else if (e.target.matches('.btn-increase, .btn-increase *')) {
+        state.recipe.updateServeings('inc');
+        recipeView.updateSertingsIngredients(state.recipe);
+    }
+    console.log(state.recipe);
+});
