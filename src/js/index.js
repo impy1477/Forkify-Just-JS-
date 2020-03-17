@@ -2,6 +2,7 @@ import Search from './models/Search';
 import {elements} from './views/Base';
 import * as searchView from './views/searchView';
 import Recipe from './models/Recipe';
+import * as recipeView from './views/recipeView'
 const state = {};
 const controlSearch = async () => {
     const query = searchView.getInput();
@@ -19,12 +20,13 @@ const controlRecipe = async ()  => {
     console.log(id);
     if (id) {
         try {
+            recipeView.clearRecipe();
             state.recipe = new Recipe(id);
             await state.recipe.getrecipe();
             state.recipe.parseIngredients();
             state.recipe.calcTime();
             state.recipe.calcServings();
-            console.log(state.recipe);
+            recipeView.renderRecipe(state.recipe);
         } catch (err) {
             console.log(err);
         }
