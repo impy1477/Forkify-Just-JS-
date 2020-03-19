@@ -1,9 +1,11 @@
 import Search from './models/Search';
 import {elements} from './views/Base';
 import * as searchView from './views/searchView';
+import * as likesView from './views/likesView';
 import Recipe from './models/Recipe';
 import * as recipeView from './views/recipeView'
 import * as listView from './views/listView'
+import Likes from './models/like';
 import List from './models/List';
 const state = {};
 const controlSearch = async () => {
@@ -25,6 +27,22 @@ const controlList = () => {
     });
 }
 
+const controlLike = () => {
+    if (!state.likes) state.likes = new Likes();
+    const currentID = state.recipe.id;
+    if (!state.likes.isLiked(currentID)) {
+        
+        const newLike = state.likes.addLike(currentID, state.recipe.title, state.recipe.author, state.recipe.image);
+        likesView.toggleLikeBtn(true);
+        likesView.renderLike(newLike);
+    } else {
+        state.likes.deleteLike(currentID);
+        likesView.toggleLikeBtn(false);
+        likesView.deleteLike(currentID);
+    }
+    likesView.toggleLikeMenu(state.likes.getNumLikes());
+}
+
 const controlRecipe = async ()  => {
     const id = window.location.hash.replace('#', '');
     console.log(id);
@@ -36,7 +54,7 @@ const controlRecipe = async ()  => {
             state.recipe.parseIngredients();
             state.recipe.calcTime();
             state.recipe.calcServings();
-            recipeView.renderRecipe(state.recipe);
+            recipeView.renderRecipe(state.recipe, state.likes.isLiked(id));
         } catch (err) {
             console.log(err);
         }
@@ -60,6 +78,14 @@ elements.searchForm.addEventListener("submit", e => {
 });
 
 ['hashchange', 'load'].forEach(e => window.addEventListener(e, controlRecipe));
+window.addEventListener('load', e => {
+    state.likes = new Likes();
+    state.likes.readStorage();
+    likesView.toggleLikeMenu(state.likes.getNumLikes());
+    state.likes.likes.forEach(like => {
+        return likesView.renderLike(like);
+    })
+});
 
 elements.recipe.addEventListener('click', e => {
     if (e.target.matches('.btn-decrease, .btn-decrease *')) {
@@ -72,6 +98,8 @@ elements.recipe.addEventListener('click', e => {
         recipeView.updateSertingsIngredients(state.recipe);
     } else if (e.target.matches('.recipe__btn--add, .recipe__btn--add *')) {
         controlList();
+    } else if (e.target.matches('.recipe__love, .recipe__love *')) {
+        controlLike();
     }
     
 });
